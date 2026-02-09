@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gelat-oat Financial Model</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Gelat-oat Financial Model</h1>
+      <p class="subtitle">Prepare your pitch to CEO Zena Doyle</p>
+    </header>
+
+    <!-- Controls -->
+    <div class="card controls-card">
+      <div class="control-group">
+        <label>Production Method</label>
+        <div class="method-buttons">
+          <button class="method-btn active" data-method="coPacker" onclick="selectMethod('coPacker')">
+            <span class="method-dot copacker"></span>
+            <span class="method-name">Co-Packer</span>
+          </button>
+          <button class="method-btn" data-method="retrofit" onclick="selectMethod('retrofit')">
+            <span class="method-dot retrofit"></span>
+            <span class="method-name">Retrofit</span>
+          </button>
+          <button class="method-btn" data-method="newPlant" onclick="selectMethod('newPlant')">
+            <span class="method-dot newplant"></span>
+            <span class="method-name">New Plant</span>
+          </button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Demand Scenario</label>
+        <div class="demand-buttons">
+          <button class="demand-btn" data-demand="low" onclick="selectDemand('low')">
+            <span class="demand-label">Low</span>
+            <span class="demand-value">350K</span>
+          </button>
+          <button class="demand-btn active" data-demand="medium" onclick="selectDemand('medium')">
+            <span class="demand-label">Medium</span>
+            <span class="demand-value">500K</span>
+          </button>
+          <button class="demand-btn" data-demand="high" onclick="selectDemand('high')">
+            <span class="demand-label">High</span>
+            <span class="demand-value">650K</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Income Statement -->
+    <div class="card statement-card">
+      <h2>Income Statement</h2>
+      <div class="volume-indicator">
+        <span class="volume-label">Volume:</span>
+        <span class="volume-value" id="volume-display">500,000 pints</span>
+        <span class="volume-price">@ $4.00/pint</span>
+      </div>
+
+      <div class="statement-table">
+        <div class="statement-row revenue">
+          <span class="row-label">Revenue (Pint Sales)</span>
+          <span class="row-value" id="revenue">$2,000,000</span>
+          <span class="row-margin" id="revenue-margin">100.0%</span>
+        </div>
+        <div class="statement-row expense">
+          <span class="row-label">Cost of Goods Sold</span>
+          <span class="row-value negative" id="cogs">($1,400,000)</span>
+          <span class="row-margin"></span>
+        </div>
+        <div class="statement-row subtotal gross-profit">
+          <span class="row-label">Gross Profit</span>
+          <span class="row-value" id="gross-profit">$600,000</span>
+          <span class="row-margin" id="gross-margin">30.0%</span>
+        </div>
+
+        <div class="statement-section">
+          <div class="section-header">Operating Expenses</div>
+          <div class="statement-row expense opex-row">
+            <span class="row-label">Sales & Marketing</span>
+            <span class="row-value negative" id="sm-cost">($280,000)</span>
+            <span class="row-delta" id="sm-delta"></span>
+          </div>
+          <div class="statement-row expense opex-row">
+            <span class="row-label">Brand Building & R&D</span>
+            <span class="row-value negative" id="brand-rd-cost">($170,000)</span>
+            <span class="row-delta" id="brand-rd-delta"></span>
+          </div>
+          <div class="statement-row expense opex-row">
+            <span class="row-label">Plant Operations</span>
+            <span class="row-value negative" id="plant-ops-cost">$0</span>
+            <span class="row-delta"></span>
+          </div>
+          <div class="statement-row subtotal opex-total">
+            <span class="row-label">Total Operating Expenses</span>
+            <span class="row-value negative" id="total-opex">($450,000)</span>
+            <span class="row-margin"></span>
+          </div>
+        </div>
+
+        <div class="statement-row total operating-income">
+          <span class="row-label">Operating Income (EBITDA)</span>
+          <span class="row-value" id="operating-income">$150,000</span>
+          <span class="row-margin" id="operating-margin">7.5%</span>
+        </div>
+      </div>
+
+      <!-- Breakeven Indicator -->
+      <div class="breakeven-indicator">
+        <div class="breakeven-item">
+          <span class="be-label">Breakeven Volume</span>
+          <span class="be-value" id="breakeven-volume">375,000 pints</span>
+        </div>
+        <div class="breakeven-item">
+          <span class="be-label">Current Volume</span>
+          <span class="be-value" id="current-volume">500,000 pints</span>
+        </div>
+        <div class="breakeven-item margin-safety">
+          <span class="be-label">Margin of Safety</span>
+          <span class="be-value" id="margin-safety">125,000 pints (33.3%)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Levers Section -->
+    <div class="levers-container">
+      <!-- Growth Levers -->
+      <div class="card levers-card growth-card">
+        <h3>Growth Levers</h3>
+        <p class="levers-subtitle">Investments to drive demand</p>
+
+        <div class="levers-list">
+          <label class="lever-item" data-lever="hireSalesperson">
+            <input type="checkbox" id="lever-hireSalesperson" onchange="updateLevers()">
+            <span class="lever-check"></span>
+            <div class="lever-content">
+              <span class="lever-name">Hire another salesperson</span>
+              <span class="lever-impact">+$80K S&M</span>
+            </div>
+            <span class="lever-tooltip" title="What does that do to your breakeven?">?</span>
+          </label>
+
+          <label class="lever-item" data-lever="brandBuilding">
+            <input type="checkbox" id="lever-brandBuilding" onchange="updateLevers()">
+            <span class="lever-check"></span>
+            <div class="lever-content">
+              <span class="lever-name">Invest in brand building</span>
+              <span class="lever-impact">+$100K B&R</span>
+            </div>
+            <span class="lever-tooltip" title="Is that worth it at low demand?">?</span>
+          </label>
+
+          <label class="lever-item" data-lever="samplingProgram">
+            <input type="checkbox" id="lever-samplingProgram" onchange="updateLevers()">
+            <span class="lever-check"></span>
+            <div class="lever-content">
+              <span class="lever-name">Launch sampling program</span>
+              <span class="lever-impact">+$50K S&M</span>
+            </div>
+            <span class="lever-tooltip" title="How quickly does that pay back?">?</span>
+          </label>
+
+          <label class="lever-item" data-lever="secondFlavor">
+            <input type="checkbox" id="lever-secondFlavor" onchange="updateLevers()">
+            <span class="lever-check"></span>
+            <div class="lever-content">
+              <span class="lever-name">Add a second flavor</span>
+              <span class="lever-impact">+$60K B&R</span>
+            </div>
+            <span class="lever-tooltip" title="That's a big volume lift. What's the risk?">?</span>
+          </label>
+        </div>
+
+      </div>
+
+      <!-- Defensive Levers -->
+      <div class="card levers-card defensive-card">
+        <h3>Defensive Levers</h3>
+        <p class="levers-subtitle">Cost cuts to protect margins</p>
+
+        <div class="levers-list">
+          <label class="lever-item" data-lever="cutSeniorSales">
+            <input type="checkbox" id="lever-cutSeniorSales" onchange="updateLevers()">
+            <span class="lever-check"></span>
+            <div class="lever-content">
+              <span class="lever-name">Cut senior salesperson</span>
+              <span class="lever-impact">saves $80K S&M</span>
+            </div>
+            <span class="lever-tooltip" title="You're cutting the people who drive demand. Is that smart?">?</span>
+          </label>
+
+          <label class="lever-item" data-lever="reduceBrandMktg">
+            <input type="checkbox" id="lever-reduceBrandMktg" onchange="updateLevers()">
+            <span class="lever-check"></span>
+            <div class="lever-content">
+              <span class="lever-name">Reduce brand & marketing</span>
+              <span class="lever-impact">saves $80K B&R</span>
+            </div>
+            <span class="lever-tooltip" title="Short-term savings, long-term brand erosion?">?</span>
+          </label>
+
+          <label class="lever-item" data-lever="pauseRD">
+            <input type="checkbox" id="lever-pauseRD" onchange="updateLevers()">
+            <span class="lever-check"></span>
+            <div class="lever-content">
+              <span class="lever-name">Pause R&D on new flavors</span>
+              <span class="lever-impact">saves $60K B&R</span>
+            </div>
+            <span class="lever-tooltip" title="Does that kill our ability to follow up with a second flavor?">?</span>
+          </label>
+
+          <label class="lever-item" data-lever="cutJuniorSales">
+            <input type="checkbox" id="lever-cutJuniorSales" onchange="updateLevers()">
+            <span class="lever-check"></span>
+            <div class="lever-content">
+              <span class="lever-name">Cut junior salesperson</span>
+              <span class="lever-impact">saves $60K S&M</span>
+            </div>
+            <span class="lever-tooltip" title="That's less painful. But is it enough?">?</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reset Button -->
+    <div class="reset-section">
+      <button class="btn-reset" onclick="resetAll()">Reset All Levers</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
