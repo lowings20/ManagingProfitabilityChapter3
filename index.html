@@ -16,21 +16,6 @@
       <p class="subtitle">Prepare your pitch to CEO Zena Doyle</p>
     </header>
 
-    <!-- View Mode Toggle -->
-    <div class="card view-mode-card">
-      <div class="view-mode-buttons">
-        <button class="view-mode-btn active" data-mode="basic" onclick="selectViewMode('basic')">
-          Basic Income Statement
-        </button>
-        <button class="view-mode-btn" data-mode="growth" onclick="selectViewMode('growth')">
-          Show Investment Toggles
-        </button>
-        <button class="view-mode-btn" data-mode="defensive" onclick="selectViewMode('defensive')">
-          Show Cost Saving Toggles
-        </button>
-      </div>
-    </div>
-
     <!-- Controls -->
     <div class="card controls-card">
       <div class="control-group">
@@ -177,6 +162,19 @@
     <!-- Reset Button -->
     <div class="reset-section">
       <button class="btn-reset" onclick="resetAll()">Reset All Levers</button>
+    </div>
+
+    <!-- View Mode Toggle -->
+    <div class="view-mode-toggle">
+      <button class="view-mode-btn active" data-mode="basic" onclick="selectViewMode('basic')">
+        Basic
+      </button>
+      <button class="view-mode-btn" data-mode="growth" onclick="selectViewMode('growth')">
+        Investments
+      </button>
+      <button class="view-mode-btn" data-mode="defensive" onclick="selectViewMode('defensive')">
+        Cost Savings
+      </button>
     </div>
   </div>
 
