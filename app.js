@@ -7,20 +7,17 @@ const productionOptions = {
   coPacker: {
     name: "Co-Packer",
     vc: 2.80,
-    plantOps: 0,
-    color: "#3B82F6"
+    plantOps: 0
   },
   retrofit: {
     name: "Retrofit",
     vc: 1.80,
-    plantOps: 438000,
-    color: "#F59E0B"
+    plantOps: 438000
   },
   newPlant: {
     name: "New Plant",
     vc: 0.80,
-    plantOps: 824000,
-    color: "#10B981"
+    plantOps: 824000
   }
 };
 
@@ -34,56 +31,23 @@ const demandScenarios = {
 };
 
 const growthLevers = {
-  hireSalesperson: {
-    volumeMultiplier: 1.15,
-    costCategory: "sm",
-    costAmount: 80000
-  },
-  brandBuilding: {
-    volumeMultiplier: 1.10,
-    costCategory: "brandRD",
-    costAmount: 100000
-  },
-  samplingProgram: {
-    volumeMultiplier: 1.08,
-    costCategory: "sm",
-    costAmount: 50000
-  },
-  secondFlavor: {
-    volumeMultiplier: 1.20,
-    costCategory: "brandRD",
-    costAmount: 60000
-  }
+  hireSalesperson: { volumeMultiplier: 1.15, costCategory: "sm", costAmount: 80000 },
+  brandBuilding: { volumeMultiplier: 1.10, costCategory: "brandRD", costAmount: 100000 },
+  samplingProgram: { volumeMultiplier: 1.08, costCategory: "sm", costAmount: 50000 },
+  secondFlavor: { volumeMultiplier: 1.20, costCategory: "brandRD", costAmount: 60000 }
 };
 
 const defensiveLevers = {
-  cutSeniorSales: {
-    volumeMultiplier: 0.94,
-    costCategory: "sm",
-    costSavings: 80000
-  },
-  reduceBrandMktg: {
-    volumeMultiplier: 1.00,
-    costCategory: "brandRD",
-    costSavings: 80000
-  },
-  pauseRD: {
-    volumeMultiplier: 1.00,
-    costCategory: "brandRD",
-    costSavings: 60000
-  },
-  cutJuniorSales: {
-    volumeMultiplier: 0.97,
-    costCategory: "sm",
-    costSavings: 60000
-  }
+  cutSeniorSales: { volumeMultiplier: 0.94, costCategory: "sm", costSavings: 80000 },
+  reduceBrandMktg: { volumeMultiplier: 1.00, costCategory: "brandRD", costSavings: 80000 },
+  pauseRD: { volumeMultiplier: 1.00, costCategory: "brandRD", costSavings: 60000 },
+  cutJuniorSales: { volumeMultiplier: 0.97, costCategory: "sm", costSavings: 60000 }
 };
 
 // State
 let selectedMethod = 'coPacker';
 let selectedDemand = 'medium';
-let activeGrowthLevers = [];
-let activeDefensiveLevers = [];
+let activeLevers = new Set();
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -118,35 +82,29 @@ function selectDemand(demand) {
   updateAll();
 }
 
-// Update levers from checkboxes
-function updateLevers() {
-  activeGrowthLevers = [];
-  activeDefensiveLevers = [];
+// Toggle a lever on/off
+function toggleLever(lever) {
+  if (activeLevers.has(lever)) {
+    activeLevers.delete(lever);
+  } else {
+    activeLevers.add(lever);
+  }
 
-  Object.keys(growthLevers).forEach(lever => {
-    const checkbox = document.getElementById(`lever-${lever}`);
-    if (checkbox && checkbox.checked) {
-      activeGrowthLevers.push(lever);
-    }
-  });
-
-  Object.keys(defensiveLevers).forEach(lever => {
-    const checkbox = document.getElementById(`lever-${lever}`);
-    if (checkbox && checkbox.checked) {
-      activeDefensiveLevers.push(lever);
-    }
-  });
+  // Update button state
+  const btn = document.querySelector(`[data-lever="${lever}"]`);
+  if (btn) {
+    btn.classList.toggle('active', activeLevers.has(lever));
+  }
 
   updateAll();
 }
 
 // Reset all levers
 function resetAll() {
-  document.querySelectorAll('.lever-item input[type="checkbox"]').forEach(cb => {
-    cb.checked = false;
+  activeLevers.clear();
+  document.querySelectorAll('.lever-toggle').forEach(btn => {
+    btn.classList.remove('active');
   });
-  activeGrowthLevers = [];
-  activeDefensiveLevers = [];
   updateAll();
 }
 
@@ -157,11 +115,13 @@ function calculate() {
 
   // Calculate adjusted volume
   let volume = baseVolume;
-  activeGrowthLevers.forEach(lever => {
-    volume *= growthLevers[lever].volumeMultiplier;
-  });
-  activeDefensiveLevers.forEach(lever => {
-    volume *= defensiveLevers[lever].volumeMultiplier;
+  activeLevers.forEach(lever => {
+    if (growthLevers[lever]) {
+      volume *= growthLevers[lever].volumeMultiplier;
+    }
+    if (defensiveLevers[lever]) {
+      volume *= defensiveLevers[lever].volumeMultiplier;
+    }
   });
   volume = Math.round(volume);
 
@@ -175,16 +135,17 @@ function calculate() {
   let sm = baseSM;
   let brandRD = baseBrandRD;
 
-  activeGrowthLevers.forEach(lever => {
-    const l = growthLevers[lever];
-    if (l.costCategory === "sm") sm += l.costAmount;
-    if (l.costCategory === "brandRD") brandRD += l.costAmount;
-  });
-
-  activeDefensiveLevers.forEach(lever => {
-    const l = defensiveLevers[lever];
-    if (l.costCategory === "sm") sm -= l.costSavings;
-    if (l.costCategory === "brandRD") brandRD -= l.costSavings;
+  activeLevers.forEach(lever => {
+    if (growthLevers[lever]) {
+      const l = growthLevers[lever];
+      if (l.costCategory === "sm") sm += l.costAmount;
+      if (l.costCategory === "brandRD") brandRD += l.costAmount;
+    }
+    if (defensiveLevers[lever]) {
+      const l = defensiveLevers[lever];
+      if (l.costCategory === "sm") sm -= l.costSavings;
+      if (l.costCategory === "brandRD") brandRD -= l.costSavings;
+    }
   });
 
   sm = Math.max(0, sm);
@@ -197,34 +158,9 @@ function calculate() {
   const operatingIncome = grossProfit - totalOpex;
   const operatingMargin = revenue > 0 ? (operatingIncome / revenue) * 100 : 0;
 
-  // Breakeven
-  const contributionMargin = PRICE - option.vc;
-  const breakeven = Math.ceil(totalOpex / contributionMargin);
-
-  // Margin of safety
-  const marginOfSafety = volume - breakeven;
-  const marginOfSafetyPct = breakeven > 0 ? (marginOfSafety / breakeven) * 100 : 0;
-
   // Calculate deltas for SM and Brand/RD
   const smDelta = sm - baseSM;
   const brandRDDelta = brandRD - baseBrandRD;
-
-  // Calculate growth and defensive summaries
-  let growthVolumeMultiplier = 1;
-  let growthCostIncrease = 0;
-  activeGrowthLevers.forEach(lever => {
-    growthVolumeMultiplier *= growthLevers[lever].volumeMultiplier;
-    growthCostIncrease += growthLevers[lever].costAmount;
-  });
-  const growthVolumePct = (growthVolumeMultiplier - 1) * 100;
-
-  let defensiveVolumeMultiplier = 1;
-  let defensiveCostSavings = 0;
-  activeDefensiveLevers.forEach(lever => {
-    defensiveVolumeMultiplier *= defensiveLevers[lever].volumeMultiplier;
-    defensiveCostSavings += defensiveLevers[lever].costSavings;
-  });
-  const defensiveVolumePct = (defensiveVolumeMultiplier - 1) * 100;
 
   return {
     volume,
@@ -238,38 +174,12 @@ function calculate() {
     totalOpex,
     operatingIncome,
     operatingMargin,
-    breakeven,
-    marginOfSafety,
-    marginOfSafetyPct,
     smDelta,
-    brandRDDelta,
-    growthVolumePct,
-    growthCostIncrease,
-    defensiveVolumePct,
-    defensiveCostSavings
+    brandRDDelta
   };
 }
 
-// Format currency
-function formatCurrency(value, showParens = false) {
-  const absValue = Math.abs(value);
-  let formatted;
-
-  if (absValue >= 1000000) {
-    formatted = '$' + (absValue / 1000000).toFixed(2) + 'M';
-  } else if (absValue >= 1000) {
-    formatted = '$' + (absValue / 1000).toFixed(0) + 'K';
-  } else {
-    formatted = '$' + absValue.toFixed(0);
-  }
-
-  if (value < 0) {
-    return showParens ? `(${formatted})` : `-${formatted}`;
-  }
-  return formatted;
-}
-
-// Format currency for statement (larger values)
+// Format currency for statement
 function formatStatementValue(value) {
   const absValue = Math.abs(value);
   const formatted = '$' + absValue.toLocaleString();
@@ -286,6 +196,17 @@ function formatPercent(value) {
   return value.toFixed(1) + '%';
 }
 
+// Format currency for deltas
+function formatCurrency(value) {
+  const absValue = Math.abs(value);
+  if (absValue >= 1000000) {
+    return (value < 0 ? '-' : '+') + '$' + (absValue / 1000000).toFixed(2) + 'M';
+  } else if (absValue >= 1000) {
+    return (value < 0 ? '-' : '+') + '$' + (absValue / 1000).toFixed(0) + 'K';
+  }
+  return (value < 0 ? '-' : '+') + '$' + absValue.toFixed(0);
+}
+
 // Update all displays
 function updateAll() {
   const result = calculate();
@@ -295,10 +216,7 @@ function updateAll() {
 
   // Income statement
   document.getElementById('revenue').textContent = formatStatementValue(result.revenue);
-  document.getElementById('revenue-margin').textContent = '100.0%';
-
   document.getElementById('cogs').textContent = formatStatementValue(-result.cogs);
-
   document.getElementById('gross-profit').textContent = formatStatementValue(result.grossProfit);
   document.getElementById('gross-margin').textContent = formatPercent(result.grossMargin);
 
@@ -313,7 +231,7 @@ function updateAll() {
   const brandRDDeltaEl = document.getElementById('brand-rd-delta');
 
   if (result.smDelta !== 0) {
-    smDeltaEl.textContent = (result.smDelta > 0 ? '+' : '') + formatCurrency(result.smDelta);
+    smDeltaEl.textContent = formatCurrency(result.smDelta);
     smDeltaEl.className = 'row-delta ' + (result.smDelta > 0 ? 'negative' : 'positive');
   } else {
     smDeltaEl.textContent = '';
@@ -321,7 +239,7 @@ function updateAll() {
   }
 
   if (result.brandRDDelta !== 0) {
-    brandRDDeltaEl.textContent = (result.brandRDDelta > 0 ? '+' : '') + formatCurrency(result.brandRDDelta);
+    brandRDDeltaEl.textContent = formatCurrency(result.brandRDDelta);
     brandRDDeltaEl.className = 'row-delta ' + (result.brandRDDelta > 0 ? 'negative' : 'positive');
   } else {
     brandRDDeltaEl.textContent = '';
@@ -341,35 +259,4 @@ function updateAll() {
   }
 
   document.getElementById('operating-margin').textContent = formatPercent(result.operatingMargin);
-
-  // Breakeven indicator
-  document.getElementById('breakeven-volume').textContent = formatNumber(result.breakeven) + ' pints';
-  document.getElementById('current-volume').textContent = formatNumber(result.volume) + ' pints';
-
-  const marginSafetyEl = document.getElementById('margin-safety');
-  const marginSafetyItem = document.querySelector('.breakeven-item.margin-safety');
-
-  if (result.marginOfSafety >= 0) {
-    marginSafetyEl.textContent = formatNumber(result.marginOfSafety) + ' pints (' + formatPercent(result.marginOfSafetyPct) + ')';
-    marginSafetyItem.classList.remove('negative');
-  } else {
-    marginSafetyEl.textContent = formatNumber(Math.abs(result.marginOfSafety)) + ' pints below (' + formatPercent(Math.abs(result.marginOfSafetyPct)) + ')';
-    marginSafetyItem.classList.add('negative');
-  }
-
-  // Growth lever summary
-  if (result.growthVolumePct > 0) {
-    document.getElementById('growth-volume-impact').textContent = '+' + formatPercent(result.growthVolumePct);
-  } else {
-    document.getElementById('growth-volume-impact').textContent = '+0%';
-  }
-  document.getElementById('growth-cost-impact').textContent = '+' + formatCurrency(result.growthCostIncrease);
-
-  // Defensive lever summary
-  document.getElementById('defensive-cost-savings').textContent = '-' + formatCurrency(result.defensiveCostSavings);
-  if (result.defensiveVolumePct < 0) {
-    document.getElementById('defensive-volume-impact').textContent = formatPercent(result.defensiveVolumePct);
-  } else {
-    document.getElementById('defensive-volume-impact').textContent = '-0%';
-  }
 }
