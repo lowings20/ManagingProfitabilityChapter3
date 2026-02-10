@@ -97,6 +97,41 @@ header h1 {
   margin-bottom: 16px;
 }
 
+/* View Mode Card */
+.view-mode-card {
+  padding: 16px 24px;
+}
+
+.view-mode-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.view-mode-btn {
+  padding: 10px 20px;
+  background: var(--color-gray-100);
+  border: 2px solid var(--color-gray-300);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-gray-700);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-mode-btn:hover {
+  border-color: var(--color-blue-500);
+  background: var(--color-blue-200);
+}
+
+.view-mode-btn.active {
+  border-color: var(--color-blue-700);
+  background: var(--color-blue-700);
+  color: var(--color-white);
+}
+
 /* Controls Card */
 .controls-card {
   display: flex;
@@ -315,6 +350,19 @@ header h1 {
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px dashed var(--color-gray-300);
+}
+
+/* View mode visibility */
+body.view-basic .row-levers {
+  display: none;
+}
+
+body.view-growth .lever-toggle.defensive {
+  display: none;
+}
+
+body.view-defensive .lever-toggle.growth {
+  display: none;
 }
 
 .lever-toggle {

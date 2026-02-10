@@ -48,11 +48,52 @@ const defensiveLevers = {
 let selectedMethod = 'coPacker';
 let selectedDemand = 'medium';
 let activeLevers = new Set();
+let viewMode = 'basic';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('view-basic');
   updateAll();
 });
+
+// Select view mode
+function selectViewMode(mode) {
+  viewMode = mode;
+
+  // Update button states
+  document.querySelectorAll('.view-mode-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.mode === mode) {
+      btn.classList.add('active');
+    }
+  });
+
+  // Update body class for CSS visibility
+  document.body.classList.remove('view-basic', 'view-growth', 'view-defensive');
+  document.body.classList.add('view-' + mode);
+
+  // Clear levers that are now hidden
+  if (mode === 'basic') {
+    activeLevers.clear();
+    document.querySelectorAll('.lever-toggle').forEach(btn => btn.classList.remove('active'));
+  } else if (mode === 'growth') {
+    // Remove defensive levers
+    Object.keys(defensiveLevers).forEach(lever => {
+      activeLevers.delete(lever);
+      const btn = document.querySelector(`[data-lever="${lever}"]`);
+      if (btn) btn.classList.remove('active');
+    });
+  } else if (mode === 'defensive') {
+    // Remove growth levers
+    Object.keys(growthLevers).forEach(lever => {
+      activeLevers.delete(lever);
+      const btn = document.querySelector(`[data-lever="${lever}"]`);
+      if (btn) btn.classList.remove('active');
+    });
+  }
+
+  updateAll();
+}
 
 // Select production method
 function selectMethod(method) {
