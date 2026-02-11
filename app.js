@@ -6,18 +6,18 @@ const PRICE = 4.00;
 const productionOptions = {
   coPacker: {
     name: "Co-Packer",
-    vc: 2.80,
+    vc: 2.70,
     plantOps: 0
   },
   retrofit: {
     name: "Retrofit",
-    vc: 1.80,
-    plantOps: 438000
+    vc: 2.10,
+    plantOps: 343000
   },
   newPlant: {
     name: "New Plant",
-    vc: 0.80,
-    plantOps: 824000
+    vc: 1.10,
+    plantOps: 753000
   }
 };
 
